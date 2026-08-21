@@ -25,9 +25,6 @@ public class TungTung {
         System.out.print("  ME: ");
         String input = scanner.nextLine();
         while (!input.equals("bye")) { // enters a loop for chatting
-            String[] parts = input.split(" ");
-            String firstWord = parts[0];
-
             if (input.equals("list")) { // list out tasks
                 System.out.println(space);
                 System.out.println("Here are the tasks in your list:");
@@ -35,23 +32,46 @@ public class TungTung {
                     System.out.println((i + 1) + ". " + list[i]);
                 }
                 System.out.println(space);
-            } else if (firstWord.equals("mark")) { // mark task as done
+            } else if (input.startsWith("mark ")) { // mark task as done
+                String[] parts = input.split(" ");
                 int idx = Integer.parseInt(parts[1]);
                 list[idx - 1].setDone();
                 System.out.println(space);
                 System.out.println("Nice! I've marked this task as done:\n  " + list[idx - 1]);
                 System.out.println(space);
-            } else if (firstWord.equals("unmark")) { // mark task as not done
+            } else if (input.startsWith("unmark ")) { // mark task as not done
+                String[] parts = input.split(" ");
                 int idx = Integer.parseInt(parts[1]);
                 list[idx - 1].setUndone();
                 System.out.println(space);
                 System.out.println("OK, I've marked this task as not done yet:\n  " + list[idx - 1]);
                 System.out.println(space);
-            } else { // add task to list
-                list[countTask] = new Task(input);
+            } else { // add task of each type to list
+                Task newTask = null;
+                if (input.startsWith("todo ")) {
+                    String description = input.substring(5);
+                    newTask = new ToDo(description);
+                } else if (input.startsWith("deadline ")) {
+                    String remainingInput = input.substring(9);
+                    String[] parts = remainingInput.split(" /by ", 2);
+                    String description = parts[0];
+                    String by = parts[1];
+                    newTask = new Deadline(description, by);
+                } else if (input.startsWith("event ")) {
+                    String remainingInput = input.substring(6);
+                    String[] parts = remainingInput.split(" /from | /to ", 3);
+                    String description = parts[0];
+                    String from = parts[1];
+                    String to = parts[2];
+                    newTask = new Event(description, from, to);
+                } else {
+                    // bad boy
+                }
+
+                list[countTask] = newTask;
                 countTask += 1;
                 System.out.println(space);
-                System.out.println("added: " + input);
+                System.out.println("Got it. I've added this task:\n  " + newTask + "\nNow you have " + countTask + " tasks in the list.");
                 System.out.println(space);
             }
 
