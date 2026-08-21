@@ -21,3 +21,6 @@ _temp/
 
 /text-ui-test/ACTUAL.TXT
 text-ui-test/EXPECTED-UNIX.TXT
+
+# Temporary output from the project-local console UI test runner
+test/.ui-test-build/
