@@ -28,6 +28,28 @@ bye
 Replace this block with the complete expected console output for this session before running the test.
 ```
 
+## Test case: delete-task
+
+### Aim
+
+Verify that `delete` removes the requested task, reports it to the user, and renumbers the remaining tasks in `list`.
+
+### Input
+
+```text
+todo read book
+todo borrow book
+delete 1
+list
+bye
+```
+
+### Expected output
+
+```text
+Replace this block with the complete expected console output for this session before running the test.
+```
+
 ## Test case: reject-empty-todo
 
 ### Aim

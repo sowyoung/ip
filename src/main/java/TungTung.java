@@ -49,17 +49,25 @@ public class TungTung {
                 System.out.println(space);
                 System.out.println("OK, I've marked this task as not done yet:\n  " + list.get(idx - 1));
                 System.out.println(space);
+            } else if (input.startsWith("delete ")) { // delete task
+                String[] parts = input.split(" ");
+                int idx = Integer.parseInt(parts[1]);
+                Task toRemove = list.get(idx - 1);
+                list.remove(idx - 1);
+                System.out.println(space);
+                System.out.println("Noted. I've removed this task:\n  " + toRemove + "\nNow you have " + list.size() + " tasks in the list.");
+                System.out.println(space);
             } else { // add task of each type to list
                 Task newTask = null;
 
                 try {
                     if (input.equals("todo")) {
-                        throw new TungTungException("OOPS!!! The description of a todo cannot be empty.");
+                        throw new TungTungException("OOPS!!! There is nothing TODO.");
                     }
                     if (input.startsWith("todo ")) {
                         String description = input.substring(5);
                         if (description.isBlank()) {
-                            throw new TungTungException("OOPS!!! The description of a todo cannot be empty.");
+                            throw new TungTungException("OOPS!!! There is nothing TODO.");
                         }
                         newTask = new ToDo(description);
                     } else if (input.startsWith("deadline ")) {
@@ -76,7 +84,7 @@ public class TungTung {
                         String to = parts[2];
                         newTask = new Event(description, from, to);
                     } else {
-                        throw new TungTungException("OOPS!!! I'm sorry, but I don't know what that means :-(");
+                        throw new TungTungException("OOPS!!! IDK what u are on about :-(");
                     }
 
                     list.add(newTask);
