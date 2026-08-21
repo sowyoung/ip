@@ -9,9 +9,12 @@ public class TungTung {
                 + " \\___ \\  / /\\ \\ |  __  |  __| |  _  /|  __|  \n"
                 + " ____) |/ ____ \\| |  | | |____| | \\ \\| |____ \n"
                 + "|_____//_/    \\_\\_|  |_|______|_|  \\_\\______|\n";
-        String greet = "Hello! Tung Tung Sahere!\nHow can I help you?";
-        String exit = "Bye! Tung Tung Nothere!";
+        String greet = "Hello! Tung Tung Sahere!\nHow can I assist?";
+        String exit = "Bye! Tung Tung Sagone!";
+
         Scanner scanner = new Scanner(System.in);
+        String[] todoList = new String[100];
+        int countTask = 0;
 
         System.out.println(space);
         System.out.println(banner);
@@ -21,9 +24,20 @@ public class TungTung {
         System.out.print("    :");
         String input = scanner.nextLine();
         while (!input.equals("bye")) {
-            System.out.println(space);
-            System.out.println(input);
-            System.out.println(space);
+            if (input.equals("list")) {
+                System.out.println(space);
+                for (int i = 0; i < countTask; i++) {
+                    System.out.println((i + 1) + ". " + todoList[i]);
+                }
+                System.out.println(space);
+            } else {
+                todoList[countTask] = input;
+                countTask += 1;
+                System.out.println(space);
+                System.out.println("added: " + input);
+                System.out.println(space);
+            }
+
             System.out.print("    :");
             input = scanner.nextLine();
         }
