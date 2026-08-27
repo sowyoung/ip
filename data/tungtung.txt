@@ -1,2 +1,2 @@
 T | 0 | borrow book
-E | 0 | project meeting | Mon 2pm | 4pm
+E | 0 | project meeting | 2019-10-15 | 2019-10-16
