@@ -3,6 +3,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
@@ -108,13 +110,18 @@ public class Storage {
             if (parts.length != 4 || parts[3].isBlank()) {
                 throw invalidTaskLine(lineNumber);
             }
-            task = new Deadline(parts[2], parts[3]);
+            task = new Deadline(parts[2], parseDate(parts[3], lineNumber));
             break;
         case "E":
             if (parts.length != 5 || parts[3].isBlank() || parts[4].isBlank()) {
                 throw invalidTaskLine(lineNumber);
             }
-            task = new Event(parts[2], parts[3], parts[4]);
+            LocalDate from = parseDate(parts[3], lineNumber);
+            LocalDate to = parseDate(parts[4], lineNumber);
+            if (to.isBefore(from)) {
+                throw invalidTaskLine(lineNumber);
+            }
+            task = new Event(parts[2], from, to);
             break;
         default:
             throw invalidTaskLine(lineNumber);
@@ -129,6 +136,22 @@ public class Storage {
     /** Returns whether the saved completion status is supported. */
     private static boolean isValidStatus(String status) {
         return status.equals("0") || status.equals("1");
+    }
+
+    /**
+     * Parses the ISO date stored in the data file.
+     *
+     * @param dateText ISO date text
+     * @param lineNumber one-based line number used in error messages
+     * @return parsed date
+     * @throws IOException if the date is invalid
+     */
+    private static LocalDate parseDate(String dateText, int lineNumber) throws IOException {
+        try {
+            return LocalDate.parse(dateText);
+        } catch (DateTimeParseException exception) {
+            throw invalidTaskLine(lineNumber);
+        }
     }
 
     /** Creates a clear error for malformed data without exposing parser details to the user. */

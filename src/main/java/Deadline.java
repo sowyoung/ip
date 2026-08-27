@@ -1,13 +1,27 @@
-public class Deadline extends Task {
-    protected String by;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Objects;
 
-    public Deadline(String description, String by) {
+/** Represents a task that must be completed by a particular calendar date. */
+public class Deadline extends Task {
+    private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd uuuu", Locale.ENGLISH);
+    protected LocalDate by;
+
+    /**
+     * Creates a deadline task.
+     *
+     * @param description task description
+     * @param by date by which the task must be completed
+     */
+    public Deadline(String description, LocalDate by) {
         super(description);
-        this.by = by;
+        this.by = Objects.requireNonNull(by, "Deadline date cannot be null.");
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + this.by + ")";
+        return "[D]" + super.toString() + " (by: " + this.by.format(DISPLAY_DATE_FORMAT) + ")";
     }
 }

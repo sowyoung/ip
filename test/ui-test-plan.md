@@ -38,7 +38,7 @@ _____________________________________________________________
   ME: _____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] borrow book
-2.[E][ ] project meeting (from: Mon 2pm - to: 4pm)
+2.[E][ ] project meeting (from: Oct 15 2019 - to: Oct 16 2019)
 _____________________________________________________________
   ME: _____________________________________________________________
 Bye! Tung Tung Sagone!
@@ -101,6 +101,8 @@ todo read book
 delete two
 deadline return book
 event project /from Monday
+deadline return book /by tomorrow
+event backwards /from 2019-10-16 /to 2019-10-15
 todo buy | sell
 bye
 ```
@@ -131,10 +133,16 @@ _____________________________________________________________
 OOPS!!! Please provide a valid task number.
 _____________________________________________________________
   ME: _____________________________________________________________
-OOPS!!! Use: deadline DESCRIPTION /by DATE.
+OOPS!!! Use: deadline DESCRIPTION /by yyyy-MM-dd.
 _____________________________________________________________
   ME: _____________________________________________________________
-OOPS!!! Use: event DESCRIPTION /from START /to END.
+OOPS!!! Use: event DESCRIPTION /from yyyy-MM-dd /to yyyy-MM-dd.
+_____________________________________________________________
+  ME: _____________________________________________________________
+OOPS!!! Dates must use yyyy-MM-dd, for example 2019-10-15.
+_____________________________________________________________
+  ME: _____________________________________________________________
+OOPS!!! An event's end date cannot be before its start date.
 _____________________________________________________________
   ME: _____________________________________________________________
 OOPS!!! Task details cannot contain " | ".
@@ -277,7 +285,7 @@ Verify that a `deadline` command separates the description and `/by` value and d
 ### Input
 
 ```text
-deadline return book /by Sunday
+deadline return book /by 2019-10-15
 bye
 ```
 
@@ -297,7 +305,7 @@ How can I assist?
 _____________________________________________________________
   ME: _____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+  [D][ ] return book (by: Oct 15 2019)
 Now you have 1 tasks in the list.
 _____________________________________________________________
   ME: _____________________________________________________________
@@ -314,7 +322,7 @@ Verify that an `event` command separates its description, `/from` value, and `/t
 ### Input
 
 ```text
-event project meeting /from Mon 2pm /to 4pm
+event project meeting /from 2019-10-15 /to 2019-10-16
 bye
 ```
 
@@ -334,7 +342,7 @@ How can I assist?
 _____________________________________________________________
   ME: _____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm - to: 4pm)
+  [E][ ] project meeting (from: Oct 15 2019 - to: Oct 16 2019)
 Now you have 1 tasks in the list.
 _____________________________________________________________
   ME: _____________________________________________________________
@@ -405,7 +413,7 @@ How can I assist?
 _____________________________________________________________
   ME: _____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm - to: 4pm)
+  [E][ ] project meeting (from: Oct 15 2019 - to: Oct 16 2019)
 Now you have 1 tasks in the list.
 _____________________________________________________________
   ME: _____________________________________________________________

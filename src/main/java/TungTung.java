@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 /**
  * Provides the console user interface for the Tung Tung task manager.
@@ -15,8 +17,11 @@ public class TungTung {
     private static final String GREETING = "Hello! Tung Tung Sahere!\nHow can I assist?";
     private static final String FAREWELL = "Bye! Tung Tung Sagone!";
     private static final String INVALID_TASK_NUMBER = "OOPS!!! Please provide a valid task number.";
-    private static final String INVALID_DEADLINE = "OOPS!!! Use: deadline DESCRIPTION /by DATE.";
-    private static final String INVALID_EVENT = "OOPS!!! Use: event DESCRIPTION /from START /to END.";
+    private static final String INVALID_DEADLINE = "OOPS!!! Use: deadline DESCRIPTION /by yyyy-MM-dd.";
+    private static final String INVALID_EVENT = "OOPS!!! Use: event DESCRIPTION /from yyyy-MM-dd /to yyyy-MM-dd.";
+    private static final String INVALID_DATE = "OOPS!!! Dates must use yyyy-MM-dd, for example 2019-10-15.";
+    private static final String INVALID_EVENT_DATE_RANGE =
+            "OOPS!!! An event's end date cannot be before its start date.";
     private static final String INVALID_FILE_SEPARATOR = "OOPS!!! Task details cannot contain \" | \".";
     private static final String SAVE_ERROR = "OOPS!!! I could not save your tasks to disk.";
     private static final String LOAD_ERROR = "OOPS!!! I could not load your saved tasks. Starting with an empty list.";
@@ -251,7 +256,7 @@ public class TungTung {
         }
         validateTaskText(parts[0]);
         validateTaskText(parts[1]);
-        return new Deadline(parts[0], parts[1]);
+        return new Deadline(parts[0], parseDate(parts[1]));
     }
 
     /**
@@ -268,7 +273,27 @@ public class TungTung {
         validateTaskText(parts[0]);
         validateTaskText(parts[1]);
         validateTaskText(parts[2]);
-        return new Event(parts[0], parts[1], parts[2]);
+        LocalDate from = parseDate(parts[1]);
+        LocalDate to = parseDate(parts[2]);
+        if (to.isBefore(from)) {
+            throw new TungTungException(INVALID_EVENT_DATE_RANGE);
+        }
+        return new Event(parts[0], from, to);
+    }
+
+    /**
+     * Parses a user-entered ISO calendar date.
+     *
+     * @param dateText date entered with a task command
+     * @return parsed date
+     * @throws TungTungException if the date is not in the required format or is impossible
+     */
+    private static LocalDate parseDate(String dateText) throws TungTungException {
+        try {
+            return LocalDate.parse(dateText);
+        } catch (DateTimeParseException exception) {
+            throw new TungTungException(INVALID_DATE);
+        }
     }
 
     /**
