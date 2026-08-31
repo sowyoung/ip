@@ -71,13 +71,14 @@ public class TungTung {
      * @param tasks list of tasks to inspect or update
      */
     private static void handleCommand(String input, TaskList tasks) {
-        if (input.equals("list")) {
+        Parser.CommandType commandType = new Parser().identify(input);
+        if (commandType == Parser.CommandType.LIST) {
             printTaskList(tasks);
-        } else if (input.equals("mark") || input.startsWith("mark ")) {
+        } else if (commandType == Parser.CommandType.MARK) {
             markTask(input, tasks, true);
-        } else if (input.equals("unmark") || input.startsWith("unmark ")) {
+        } else if (commandType == Parser.CommandType.UNMARK) {
             markTask(input, tasks, false);
-        } else if (input.equals("delete") || input.startsWith("delete ")) {
+        } else if (commandType == Parser.CommandType.DELETE) {
             deleteTask(input, tasks);
         } else {
             addTask(input, tasks);
