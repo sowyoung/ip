@@ -11,7 +11,12 @@ import java.util.ArrayList;
  * Saves and loads Tung Tung tasks from a text file on the hard disk.
  */
 public class Storage {
-    private static final Path DATA_FILE = Path.of("data", "tungtung.txt");
+    private final Path dataFile;
+
+    /** Creates storage backed by the supplied file path. */
+    public Storage(String filePath) {
+        this.dataFile = Path.of(filePath);
+    }
 
     /**
      * Writes every task to the data file, replacing its previous contents.
@@ -19,13 +24,16 @@ public class Storage {
      * @param tasks tasks to save
      * @throws IOException if the data directory or file cannot be written
      */
-    public static void save(ArrayList<Task> tasks) throws IOException {
+    public void save(ArrayList<Task> tasks) throws IOException {
         ArrayList<String> taskLines = new ArrayList<>();
         for (Task task : tasks) {
             taskLines.add(toFileLine(task));
         }
 
-        Path dataDirectory = DATA_FILE.getParent();
+        Path dataDirectory = dataFile.getParent();
+        if (dataDirectory == null) {
+            dataDirectory = Path.of(".");
+        }
         Files.createDirectories(dataDirectory);
         Path temporaryFile = Files.createTempFile(dataDirectory, "tungtung-", ".tmp");
         try {
@@ -42,13 +50,13 @@ public class Storage {
      * @return the tasks reconstructed from the data file
      * @throws IOException if the file cannot be read or contains an invalid task line
      */
-    public static ArrayList<Task> load() throws IOException {
+    public ArrayList<Task> load() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
-        if (!Files.exists(DATA_FILE)) {
+        if (!Files.exists(dataFile)) {
             return tasks;
         }
 
-        ArrayList<String> taskLines = new ArrayList<>(Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8));
+        ArrayList<String> taskLines = new ArrayList<>(Files.readAllLines(dataFile, StandardCharsets.UTF_8));
         for (int index = 0; index < taskLines.size(); index++) {
             String taskLine = taskLines.get(index);
             if (!taskLine.isBlank()) {
@@ -165,12 +173,12 @@ public class Storage {
      * @param temporaryFile completed temporary file in the data directory
      * @throws IOException if the data file cannot be replaced
      */
-    private static void moveIntoPlace(Path temporaryFile) throws IOException {
+    private void moveIntoPlace(Path temporaryFile) throws IOException {
         try {
-            Files.move(temporaryFile, DATA_FILE, StandardCopyOption.ATOMIC_MOVE,
+            Files.move(temporaryFile, dataFile, StandardCopyOption.ATOMIC_MOVE,
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (java.nio.file.AtomicMoveNotSupportedException exception) {
-            Files.move(temporaryFile, DATA_FILE, StandardCopyOption.REPLACE_EXISTING);
+            Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

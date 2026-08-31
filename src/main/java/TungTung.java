@@ -33,10 +33,11 @@ public class TungTung {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Ui ui = new Ui();
+        Storage storage = new Storage("data/tungtung.txt");
 
         ui.showGreeting();
-        TaskList tasks = loadTasks();
-        processCommands(scanner, tasks);
+        TaskList tasks = loadTasks(storage);
+        processCommands(scanner, tasks, storage);
         ui.showFarewell();
     }
 
@@ -52,7 +53,7 @@ public class TungTung {
      * @param scanner source of console input
      * @param tasks list of tasks to update
      */
-    private static void processCommands(Scanner scanner, TaskList tasks) {
+    private static void processCommands(Scanner scanner, TaskList tasks, Storage storage) {
         while (scanner.hasNextLine()) {
             System.out.print("  ME: ");
             String input = scanner.nextLine();
@@ -60,7 +61,7 @@ public class TungTung {
             if (input.equals("bye")) {
                 return;
             }
-            handleCommand(input, tasks);
+            handleCommand(input, tasks, storage);
         }
     }
 
@@ -70,18 +71,18 @@ public class TungTung {
      * @param input command entered by the user
      * @param tasks list of tasks to inspect or update
      */
-    private static void handleCommand(String input, TaskList tasks) {
+    private static void handleCommand(String input, TaskList tasks, Storage storage) {
         Parser.CommandType commandType = new Parser().identify(input);
         if (commandType == Parser.CommandType.LIST) {
             printTaskList(tasks);
         } else if (commandType == Parser.CommandType.MARK) {
-            markTask(input, tasks, true);
+            markTask(input, tasks, true, storage);
         } else if (commandType == Parser.CommandType.UNMARK) {
-            markTask(input, tasks, false);
+            markTask(input, tasks, false, storage);
         } else if (commandType == Parser.CommandType.DELETE) {
-            deleteTask(input, tasks);
+            deleteTask(input, tasks, storage);
         } else {
-            addTask(input, tasks);
+            addTask(input, tasks, storage);
         }
     }
 
@@ -106,7 +107,7 @@ public class TungTung {
      * @param tasks tasks to update
      * @param isDone whether the task should be marked as completed
      */
-    private static void markTask(String input, TaskList tasks, boolean isDone) {
+    private static void markTask(String input, TaskList tasks, boolean isDone, Storage storage) {
         Task task;
         try {
             task = getTask(input, tasks);
@@ -120,7 +121,7 @@ public class TungTung {
         } else {
             task.setUndone();
         }
-        if (!saveTasks(tasks)) {
+        if (!saveTasks(tasks, storage)) {
             if (wasDone) {
                 task.setDone();
             } else {
@@ -142,7 +143,7 @@ public class TungTung {
      * @param input delete command entered by the user
      * @param tasks tasks to update
      */
-    private static void deleteTask(String input, TaskList tasks) {
+    private static void deleteTask(String input, TaskList tasks, Storage storage) {
         int taskIndex;
         try {
             taskIndex = getTaskIndex(input, tasks);
@@ -151,7 +152,7 @@ public class TungTung {
             return;
         }
         Task removedTask = tasks.remove(taskIndex);
-        if (!saveTasks(tasks)) {
+        if (!saveTasks(tasks, storage)) {
             tasks.add(taskIndex, removedTask);
             return;
         }
@@ -201,11 +202,11 @@ public class TungTung {
      * @param input command entered by the user
      * @param tasks tasks to update
      */
-    private static void addTask(String input, TaskList tasks) {
+    private static void addTask(String input, TaskList tasks, Storage storage) {
         try {
             Task newTask = createTask(input);
             tasks.add(newTask);
-            if (!saveTasks(tasks)) {
+            if (!saveTasks(tasks, storage)) {
                 tasks.remove(tasks.size() - 1);
                 return;
             }
@@ -319,9 +320,9 @@ public class TungTung {
      *
      * @param tasks tasks to save
      */
-    private static boolean saveTasks(TaskList tasks) {
+    private static boolean saveTasks(TaskList tasks, Storage storage) {
         try {
-            Storage.save(tasks.toArrayList());
+            storage.save(tasks.toArrayList());
             return true;
         } catch (java.io.IOException | SecurityException exception) {
             printError(SAVE_ERROR);
@@ -334,9 +335,9 @@ public class TungTung {
      *
      * @param tasks list that receives the restored tasks
      */
-    private static TaskList loadTasks() {
+    private static TaskList loadTasks(Storage storage) {
         try {
-            return new TaskList(Storage.load());
+            return new TaskList(storage.load());
         } catch (java.io.IOException | SecurityException exception) {
             printError(LOAD_ERROR);
             return new TaskList();
