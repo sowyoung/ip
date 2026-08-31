@@ -59,6 +59,7 @@ public class TungTung {
     private static void processCommands(Scanner scanner, TaskList tasks, Storage storage) {
         while (scanner.hasNextLine()) {
             System.out.print("  ME: ");
+            System.out.flush();
             String input = scanner.nextLine();
 
             if (input.equals("bye")) {
