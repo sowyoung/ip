@@ -37,7 +37,7 @@ test {
 }
 
 application {
-    mainClass = 'seedu.duke.Duke'
+    mainClass = 'tungtung.TungTung'
 }
 
 jar {
@@ -54,3 +54,4 @@ shadowJar {
 run {
     standardInput = System.in
 }
+
