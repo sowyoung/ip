@@ -1,3 +1,5 @@
+package tungtung;
+
 /**
  * Represents a command that Tung Tung cannot process because its format is invalid.
  */

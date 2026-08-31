@@ -6,7 +6,7 @@ This file is the source of truth for Tung Tung's console UI tests. Each case run
 
 - Java version: 25
 - Source directory: `src/main/java`
-- Main class: `TungTung`
+- Main class: `tungtung.TungTung`
 
 ## Test case: load-saved-tasks
 

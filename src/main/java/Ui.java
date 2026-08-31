@@ -1,3 +1,5 @@
+package tungtung;
+
 /** Handles console output for Tung Tung. */
 public class Ui {
     /** Displays the standard divider. */
