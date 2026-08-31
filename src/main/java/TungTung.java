@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
  * Provides the console user interface for the Tung Tung task manager.
  */
 public class TungTung {
+    private static final Ui UI = new Ui();
+    private static final Parser PARSER = new Parser();
     private static final String DIVIDER = "_____________________________________________________________";
     private static final String BANNER = "  _____          _    _ ______ _____  ______ \n"
             + " / ____|   /\\   | |  | |  ____|  __ \\|  ____|\n"
@@ -32,13 +34,12 @@ public class TungTung {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Ui ui = new Ui();
         Storage storage = new Storage("data/tungtung.txt");
 
-        ui.showGreeting();
+        UI.showGreeting();
         TaskList tasks = loadTasks(storage);
         processCommands(scanner, tasks, storage);
-        ui.showFarewell();
+        UI.showFarewell();
     }
 
     /** Prints the banner and greeting used by {@link Ui}. */
@@ -72,7 +73,7 @@ public class TungTung {
      * @param tasks list of tasks to inspect or update
      */
     private static void handleCommand(String input, TaskList tasks, Storage storage) {
-        Parser.CommandType commandType = new Parser().identify(input);
+        Parser.CommandType commandType = PARSER.identify(input);
         if (commandType == Parser.CommandType.LIST) {
             printTaskList(tasks);
         } else if (commandType == Parser.CommandType.MARK) {
@@ -204,7 +205,7 @@ public class TungTung {
      */
     private static void addTask(String input, TaskList tasks, Storage storage) {
         try {
-            Task newTask = new Parser().parseTask(input);
+            Task newTask = PARSER.parseTask(input);
             tasks.add(newTask);
             if (!saveTasks(tasks, storage)) {
                 tasks.remove(tasks.size() - 1);
