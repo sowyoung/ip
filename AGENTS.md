@@ -37,6 +37,10 @@ After every update to Java source code or other code that can affect the chatbot
 
 If the test environment is unavailable, report the reason and do not claim that the UI tests passed.
 
+## JUnit coverage target
+
+Maintain JUnit tests for approximately the highest-value 50% of methods, prioritizing complex, core, and critical business logic. After every code change, review and update the relevant JUnit tests to keep them compliant with this coverage target, and run the Gradle test task when the environment permits.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
