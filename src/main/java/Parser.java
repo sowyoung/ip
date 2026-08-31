@@ -1,5 +1,13 @@
-/** Classifies the command keyword entered by the user. */
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+/** Classifies commands and creates tasks from user input. */
 public class Parser {
+    private static final String INVALID_DEADLINE = "OOPS!!! Use: deadline DESCRIPTION /by yyyy-MM-dd.";
+    private static final String INVALID_EVENT = "OOPS!!! Use: event DESCRIPTION /from yyyy-MM-dd /to yyyy-MM-dd.";
+    private static final String INVALID_DATE = "OOPS!!! Dates must use yyyy-MM-dd, for example 2019-10-15.";
+    private static final String INVALID_EVENT_DATE_RANGE = "OOPS!!! An event's end date cannot be before its start date.";
+    private static final String INVALID_FILE_SEPARATOR = "OOPS!!! Task details cannot contain \" | \".";
     /** The command categories understood by Tung Tung. */
     public enum CommandType { LIST, MARK, UNMARK, DELETE, ADD }
 
@@ -23,5 +31,46 @@ public class Parser {
             return CommandType.DELETE;
         }
         return CommandType.ADD;
+    }
+
+    /** Creates a task from a todo, deadline, or event command. */
+    public Task parseTask(String input) throws TungTungException {
+        if (input.equals("todo") || input.equals("todo ")) throw new TungTungException("OOPS!!! There is nothing TODO.");
+        if (input.startsWith("todo ")) {
+            String description = input.substring(5);
+            if (description.isBlank()) throw new TungTungException("OOPS!!! There is nothing TODO.");
+            validateTaskText(description);
+            return new ToDo(description);
+        }
+        if (input.equals("deadline")) throw new TungTungException(INVALID_DEADLINE);
+        if (input.startsWith("deadline ")) return parseDeadline(input.substring(9));
+        if (input.equals("event")) throw new TungTungException(INVALID_EVENT);
+        if (input.startsWith("event ")) return parseEvent(input.substring(6));
+        throw new TungTungException("OOPS!!! IDK what u are on about :-()");
+    }
+
+    private Deadline parseDeadline(String input) throws TungTungException {
+        String[] parts = input.split(" /by ", 2);
+        if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) throw new TungTungException(INVALID_DEADLINE);
+        validateTaskText(parts[0]); validateTaskText(parts[1]);
+        return new Deadline(parts[0], parseDate(parts[1]));
+    }
+
+    private Event parseEvent(String input) throws TungTungException {
+        String[] parts = input.split(" /from | /to ", 3);
+        if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) throw new TungTungException(INVALID_EVENT);
+        validateTaskText(parts[0]); validateTaskText(parts[1]); validateTaskText(parts[2]);
+        LocalDate from = parseDate(parts[1]); LocalDate to = parseDate(parts[2]);
+        if (to.isBefore(from)) throw new TungTungException(INVALID_EVENT_DATE_RANGE);
+        return new Event(parts[0], from, to);
+    }
+
+    private LocalDate parseDate(String dateText) throws TungTungException {
+        try { return LocalDate.parse(dateText); }
+        catch (DateTimeParseException exception) { throw new TungTungException(INVALID_DATE); }
+    }
+
+    private void validateTaskText(String text) throws TungTungException {
+        if (text.contains(" | ")) throw new TungTungException(INVALID_FILE_SEPARATOR);
     }
 }

@@ -204,7 +204,7 @@ public class TungTung {
      */
     private static void addTask(String input, TaskList tasks, Storage storage) {
         try {
-            Task newTask = createTask(input);
+            Task newTask = new Parser().parseTask(input);
             tasks.add(newTask);
             if (!saveTasks(tasks, storage)) {
                 tasks.remove(tasks.size() - 1);
