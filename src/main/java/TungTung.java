@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -32,13 +31,19 @@ public class TungTung {
      * @param args command-line arguments; they are not used by this application
      */
     public static void main(String[] args) {
-        ArrayList<Task> tasks = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
 
-        printGreeting();
-        loadTasks(tasks);
+        ui.showGreeting();
+        TaskList tasks = loadTasks();
         processCommands(scanner, tasks);
-        printFarewell();
+        ui.showFarewell();
+    }
+
+    /** Prints the banner and greeting used by {@link Ui}. */
+    public static void printGreetingBanner() {
+        System.out.println(BANNER);
+        System.out.println(GREETING);
     }
 
     /**
@@ -47,7 +52,7 @@ public class TungTung {
      * @param scanner source of console input
      * @param tasks list of tasks to update
      */
-    private static void processCommands(Scanner scanner, ArrayList<Task> tasks) {
+    private static void processCommands(Scanner scanner, TaskList tasks) {
         while (scanner.hasNextLine()) {
             System.out.print("  ME: ");
             String input = scanner.nextLine();
@@ -65,7 +70,7 @@ public class TungTung {
      * @param input command entered by the user
      * @param tasks list of tasks to inspect or update
      */
-    private static void handleCommand(String input, ArrayList<Task> tasks) {
+    private static void handleCommand(String input, TaskList tasks) {
         if (input.equals("list")) {
             printTaskList(tasks);
         } else if (input.equals("mark") || input.startsWith("mark ")) {
@@ -84,7 +89,7 @@ public class TungTung {
      *
      * @param tasks tasks to display
      */
-    private static void printTaskList(ArrayList<Task> tasks) {
+    private static void printTaskList(TaskList tasks) {
         printDivider();
         System.out.println("Here are the tasks in your list:");
         for (int index = 0; index < tasks.size(); index++) {
@@ -100,7 +105,7 @@ public class TungTung {
      * @param tasks tasks to update
      * @param isDone whether the task should be marked as completed
      */
-    private static void markTask(String input, ArrayList<Task> tasks, boolean isDone) {
+    private static void markTask(String input, TaskList tasks, boolean isDone) {
         Task task;
         try {
             task = getTask(input, tasks);
@@ -136,7 +141,7 @@ public class TungTung {
      * @param input delete command entered by the user
      * @param tasks tasks to update
      */
-    private static void deleteTask(String input, ArrayList<Task> tasks) {
+    private static void deleteTask(String input, TaskList tasks) {
         int taskIndex;
         try {
             taskIndex = getTaskIndex(input, tasks);
@@ -161,7 +166,7 @@ public class TungTung {
      * @param input command containing a task number
      * @return the task number supplied by the user
      */
-    private static Task getTask(String input, ArrayList<Task> tasks) throws TungTungException {
+    private static Task getTask(String input, TaskList tasks) throws TungTungException {
         return tasks.get(getTaskIndex(input, tasks));
     }
 
@@ -173,7 +178,7 @@ public class TungTung {
      * @return the zero-based index of the selected task
      * @throws TungTungException if the command has no valid task number
      */
-    private static int getTaskIndex(String input, ArrayList<Task> tasks) throws TungTungException {
+    private static int getTaskIndex(String input, TaskList tasks) throws TungTungException {
         String[] parts = input.trim().split("\\s+");
         if (parts.length != 2) {
             throw new TungTungException(INVALID_TASK_NUMBER);
@@ -195,7 +200,7 @@ public class TungTung {
      * @param input command entered by the user
      * @param tasks tasks to update
      */
-    private static void addTask(String input, ArrayList<Task> tasks) {
+    private static void addTask(String input, TaskList tasks) {
         try {
             Task newTask = createTask(input);
             tasks.add(newTask);
@@ -313,9 +318,9 @@ public class TungTung {
      *
      * @param tasks tasks to save
      */
-    private static boolean saveTasks(ArrayList<Task> tasks) {
+    private static boolean saveTasks(TaskList tasks) {
         try {
-            Storage.save(tasks);
+            Storage.save(tasks.toArrayList());
             return true;
         } catch (java.io.IOException | SecurityException exception) {
             printError(SAVE_ERROR);
@@ -328,11 +333,12 @@ public class TungTung {
      *
      * @param tasks list that receives the restored tasks
      */
-    private static void loadTasks(ArrayList<Task> tasks) {
+    private static TaskList loadTasks() {
         try {
-            tasks.addAll(Storage.load());
+            return new TaskList(Storage.load());
         } catch (java.io.IOException | SecurityException exception) {
             printError(LOAD_ERROR);
+            return new TaskList();
         }
     }
 
