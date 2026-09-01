@@ -1,8 +1,9 @@
 package tungtung;
 
-import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Provides the console user interface for the Tung Tung task manager.
@@ -28,6 +29,7 @@ public class TungTung {
     private static final String INVALID_FILE_SEPARATOR = "OOPS!!! Task details cannot contain \" | \".";
     private static final String SAVE_ERROR = "OOPS!!! I could not save your tasks to disk.";
     private static final String LOAD_ERROR = "OOPS!!! I could not load your saved tasks. Starting with an empty list.";
+    private static final String INVALID_FIND_KEYWORD = "OOPS!!! Please provide a keyword to find.";
 
     /**
      * Starts Tung Tung and processes commands until the user enters {@code bye}.
@@ -77,6 +79,8 @@ public class TungTung {
         Parser.CommandType commandType = PARSER.identify(input);
         if (commandType == Parser.CommandType.LIST) {
             printTaskList(tasks);
+        } else if (commandType == Parser.CommandType.FIND) {
+            findTasks(input, tasks);
         } else if (commandType == Parser.CommandType.MARK) {
             markTask(input, tasks, true, storage);
         } else if (commandType == Parser.CommandType.UNMARK) {
@@ -86,6 +90,23 @@ public class TungTung {
         } else {
             addTask(input, tasks, storage);
         }
+    }
+
+    /** Displays tasks whose descriptions contain the keyword in a find command. */
+    private static void findTasks(String input, TaskList tasks) {
+        String[] parts = input.trim().split("\\s+", 2);
+        if (parts.length != 2 || parts[1].isBlank()) {
+            printError(INVALID_FIND_KEYWORD);
+            return;
+        }
+
+        ArrayList<Task> matchingTasks = tasks.find(parts[1]);
+        printDivider();
+        System.out.println("Here are the matching tasks in your list:");
+        for (int index = 0; index < matchingTasks.size(); index++) {
+            System.out.println((index + 1) + "." + matchingTasks.get(index));
+        }
+        printDivider();
     }
 
     /**

@@ -17,6 +17,11 @@ class ParserTest {
     }
 
     @Test
+    void identify_findCommand_returnsFind() {
+        assertEquals(Parser.CommandType.FIND, parser.identify("find book"));
+    }
+
+    @Test
     void identify_markCommand_returnsMark() {
         assertEquals(Parser.CommandType.MARK, parser.identify("mark"));
         assertEquals(Parser.CommandType.MARK, parser.identify("mark 1"));
