@@ -1,6 +1,7 @@
 package tungtung;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Stores the tasks in the order that they should be shown to the user.
@@ -77,5 +78,16 @@ public class TaskList {
      */
     public ArrayList<Task> toArrayList() {
         return new ArrayList<>(tasks);
+    }
+
+    /** Returns tasks whose descriptions contain the supplied keyword, ignoring case. */
+    public ArrayList<Task> find(String keyword) {
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.description.toLowerCase(Locale.ROOT).contains(keyword.toLowerCase(Locale.ROOT))) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
     }
 }

@@ -66,4 +66,15 @@ class TaskListTest {
         exported.clear();
         assertEquals(1, tasks.size());
     }
+
+    @Test
+    void taskList_find_matchesDescriptionIgnoringCase() {
+        TaskList tasks = new TaskList();
+        Task matchingTask = new ToDo("Read the BOOK");
+        tasks.add(matchingTask);
+        tasks.add(new ToDo("Write notes"));
+
+        assertEquals(1, tasks.find("book").size());
+        assertEquals(matchingTask, tasks.find("book").get(0));
+    }
 }

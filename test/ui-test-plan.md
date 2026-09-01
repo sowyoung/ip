@@ -45,6 +45,55 @@ Bye! Tung Tung Sagone!
 _____________________________________________________________
 ```
 
+## Test case: find-task-by-keyword
+
+### Aim
+
+Verify that `find` displays matching tasks in their original order and numbers only the matches.
+
+### Input
+
+```text
+todo read book
+deadline return book /by 2019-10-15
+find book
+bye
+```
+
+### Expected output
+
+```text
+_____________________________________________________________
+  _____          _    _ ______ _____  ______ 
+ / ____|   /\   | |  | |  ____|  __ \|  ____|
+| (___    /  \  | |__| | |__  | |__) | |__   
+ \___ \  / /\ \ |  __  |  __| |  _  /|  __|  
+ ____) |/ ____ \| |  | | |____| | \ \| |____ 
+|_____//_/    \_\_|  |_|______|_|  \_\|______|
+
+Hello! Tung Tung Sahere!
+How can I assist?
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Oct 15 2019)
+Now you have 2 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Oct 15 2019)
+_____________________________________________________________
+_____________________________________________________________
+Bye! Tung Tung Sagone!
+_____________________________________________________________
+```
+
 ## Test case: add-and-list-todo
 
 ### Aim
