@@ -24,6 +24,12 @@ Unless the user says otherwise, assume that you are assisting a student working 
 
 # Project-specific requirements
 
+## Java coding standard
+
+All Java code in this project must follow the project-specific `seedu-java-coding-standard` skill, based on the
+[SE-EDU Java coding standard](https://se-education.org/guides/conventions/java/intermediate.html). Apply it to new and
+modified production and test code, including naming, layout, braces, imports, line length, and Javadoc requirements.
+
 ## Java version:
 
 Ensure that Java 25 is used when running the application or build tasks. On macOS, use `sdk use java 25.0.3.fx-zulu` to switch to Java 25 if needed.
@@ -42,6 +48,10 @@ If the test environment is unavailable, report the reason and do not claim that 
 Maintain JUnit tests for approximately the highest-value 50% of methods, prioritizing complex, core, and critical business logic. After every code change, review and update the relevant JUnit tests to keep them compliant with this coverage target, and run the Gradle test task when the environment permits.
 
 ## Git
+
+All future commits and branch names must follow the project-specific `seedu-git-standard` skill, based on the
+[SE-EDU Git conventions](https://se-education.org/guides/conventions/git.html). Before committing, verify the subject,
+body, and branch name against that skill. Do not commit or push unless explicitly asked.
 
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
