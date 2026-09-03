@@ -4,6 +4,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -99,9 +100,14 @@ public class TungTungGui extends Application {
         avatarView.setFitWidth(42);
         avatarView.setFitHeight(42);
         HBox row = alignment == Pos.CENTER_RIGHT
-                ? new HBox(8, message, avatarView)
-                : new HBox(8, avatarView, message);
+                ? createMessageRow(message, avatarView)
+                : createMessageRow(avatarView, message);
         row.setAlignment(alignment);
         messages.getChildren().add(row);
+    }
+
+    /** Creates a message row containing a flexible number of JavaFX nodes. */
+    private HBox createMessageRow(Node... nodes) {
+        return new HBox(8, nodes);
     }
 }
