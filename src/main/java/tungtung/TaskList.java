@@ -89,8 +89,10 @@ public class TaskList {
     /** Returns tasks whose descriptions contain the supplied keyword, ignoring case. */
     public ArrayList<Task> find(String keyword) {
         ArrayList<Task> matchingTasks = new ArrayList<>();
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
         for (Task task : tasks) {
-            if (task.description.toLowerCase(Locale.ROOT).contains(keyword.toLowerCase(Locale.ROOT))) {
+            String normalizedDescription = task.description.toLowerCase(Locale.ROOT);
+            if (normalizedDescription.contains(normalizedKeyword)) {
                 matchingTasks.add(task);
             }
         }

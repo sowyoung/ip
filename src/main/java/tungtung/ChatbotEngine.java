@@ -44,7 +44,8 @@ public class ChatbotEngine {
             Task task = parser.parseTask(command);
             tasks.add(task);
             save();
-            return "Got it! I've added this task:\n" + task;
+            return "Got it! I've added this task:\n" + task
+                    + "\nNow you have " + tasks.size() + " tasks in the list.";
         } catch (TungTungException | IOException | SecurityException exception) {
             return "OOPS!!! " + exception.getMessage();
         }
@@ -84,7 +85,8 @@ public class ChatbotEngine {
         }
         Task removedTask = tasks.remove(taskIndex(parts[1]));
         save();
-        return "Removed task:\n" + removedTask;
+        return "Removed task:\n" + removedTask
+                + "\nNow you have " + tasks.size() + " tasks in the list.";
     }
 
     private int taskIndex(String number) throws TungTungException {
