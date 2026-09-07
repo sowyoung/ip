@@ -107,6 +107,9 @@ public class Storage {
         if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isBlank()) {
             throw invalidTaskLine(lineNumber);
         }
+        assert parts.length >= 3 : "A validated task line has at least type, status, and description fields.";
+        assert isValidStatus(parts[1]) : "A validated task line has a binary completion status.";
+        assert !parts[2].isBlank() : "A validated task line has a non-empty description.";
 
         Task task;
         switch (parts[0]) {
@@ -140,6 +143,7 @@ public class Storage {
         if (parts[1].equals("1")) {
             task.setDone();
         }
+        assert task != null : "A valid task line must reconstruct a task.";
         return task;
     }
 

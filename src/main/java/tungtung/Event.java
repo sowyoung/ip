@@ -26,6 +26,7 @@ public class Event extends Task {
         if (this.to.isBefore(this.from)) {
             throw new IllegalArgumentException("Event end date cannot be before its start date.");
         }
+        assert !this.to.isBefore(this.from) : "An event must end on or after its start date.";
     }
 
     @Override
