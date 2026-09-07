@@ -20,6 +20,7 @@ public class TaskList {
      * @param tasks tasks to place in the list
      */
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null : "A task list must be created from a task collection.";
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -29,6 +30,7 @@ public class TaskList {
      * @param task task to add
      */
     public void add(Task task) {
+        assert task != null : "The task list must not contain null tasks.";
         tasks.add(task);
     }
 
@@ -39,6 +41,8 @@ public class TaskList {
      * @param task task to insert
      */
     public void add(int index, Task task) {
+        assert task != null : "The task list must not contain null tasks.";
+        assert index >= 0 && index <= tasks.size() : "Insertion index must be within the list bounds.";
         tasks.add(index, task);
     }
 
@@ -49,6 +53,7 @@ public class TaskList {
      * @return task at the requested position
      */
     public Task get(int index) {
+        assert index >= 0 && index < tasks.size() : "A requested task index must refer to an existing task.";
         return tasks.get(index);
     }
 
@@ -59,6 +64,7 @@ public class TaskList {
      * @return removed task
      */
     public Task remove(int index) {
+        assert index >= 0 && index < tasks.size() : "A removed task index must refer to an existing task.";
         return tasks.remove(index);
     }
 
