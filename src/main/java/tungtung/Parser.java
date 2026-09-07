@@ -72,6 +72,7 @@ public class Parser {
         if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
             throw new TungTungException(INVALID_DEADLINE);
         }
+        assert parts.length == 2 : "A validated deadline command has description and date fields.";
         validateTaskText(parts[0]);
         validateTaskText(parts[1]);
         return new Deadline(parts[0], parseDate(parts[1]));
@@ -82,6 +83,7 @@ public class Parser {
         if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
             throw new TungTungException(INVALID_EVENT);
         }
+        assert parts.length == 3 : "A validated event command has description, start, and end fields.";
         validateTaskText(parts[0]);
         validateTaskText(parts[1]);
         validateTaskText(parts[2]);
@@ -90,6 +92,7 @@ public class Parser {
         if (to.isBefore(from)) {
             throw new TungTungException(INVALID_EVENT_DATE_RANGE);
         }
+        assert !to.isBefore(from) : "An accepted event must have a non-reversed date range.";
         return new Event(parts[0], from, to);
     }
 
