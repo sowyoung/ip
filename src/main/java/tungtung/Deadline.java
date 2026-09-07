@@ -20,6 +20,7 @@ public class Deadline extends Task {
     public Deadline(String description, LocalDate by) {
         super(description);
         this.by = Objects.requireNonNull(by, "Deadline date cannot be null.");
+        assert this.by != null : "A deadline must have a date after construction.";
     }
 
     @Override
