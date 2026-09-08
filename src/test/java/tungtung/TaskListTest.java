@@ -3,6 +3,7 @@ package tungtung;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
@@ -76,5 +77,25 @@ class TaskListTest {
 
         assertEquals(1, tasks.find("book").size());
         assertEquals(matchingTask, tasks.find("book").get(0));
+    }
+
+    @Test
+    void taskList_sortByDate_sortsChronologicallyAndKeepsUndatedLast() {
+        TaskList tasks = new TaskList();
+        Task late = new Deadline("late", LocalDate.of(2026, 9, 12));
+        Task todo = new ToDo("todo");
+        Task event = new Event("event", LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 11));
+        Task early = new Deadline("early", LocalDate.of(2026, 9, 10));
+        tasks.add(late);
+        tasks.add(todo);
+        tasks.add(event);
+        tasks.add(early);
+
+        tasks.sortByDate();
+
+        assertEquals(event, tasks.get(0));
+        assertEquals(early, tasks.get(1));
+        assertEquals(late, tasks.get(2));
+        assertEquals(todo, tasks.get(3));
     }
 }

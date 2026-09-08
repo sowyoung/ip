@@ -12,7 +12,7 @@ public class Parser {
             "OOPS!!! An event's end date cannot be before its start date.";
     private static final String INVALID_FILE_SEPARATOR = "OOPS!!! Task details cannot contain \" | \".";
     /** The command categories understood by Tung Tung. */
-    public enum CommandType { LIST, FIND, MARK, UNMARK, DELETE, ADD }
+    public enum CommandType { LIST, FIND, SORT, MARK, UNMARK, DELETE, ADD }
 
     /**
      * Identifies which operation a command requests.
@@ -26,6 +26,9 @@ public class Parser {
         }
         if (input.equals("find") || input.startsWith("find ")) {
             return CommandType.FIND;
+        }
+        if (input.equals("sort") || input.startsWith("sort ")) {
+            return CommandType.SORT;
         }
         if (input.equals("mark") || input.startsWith("mark ")) {
             return CommandType.MARK;

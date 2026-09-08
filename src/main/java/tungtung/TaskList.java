@@ -1,6 +1,8 @@
 package tungtung;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -93,5 +95,21 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.description.toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /** Sorts dated tasks chronologically and places undated tasks at the end. */
+    public void sortByDate() {
+        tasks.sort(Comparator.comparing(this::getTaskDate,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+    }
+
+    private LocalDate getTaskDate(Task task) {
+        if (task instanceof Deadline) {
+            return ((Deadline) task).by;
+        }
+        if (task instanceof Event) {
+            return ((Event) task).from;
+        }
+        return null;
     }
 }

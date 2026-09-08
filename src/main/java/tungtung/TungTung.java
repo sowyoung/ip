@@ -81,6 +81,8 @@ public class TungTung {
             printTaskList(tasks);
         } else if (commandType == Parser.CommandType.FIND) {
             findTasks(input, tasks);
+        } else if (commandType == Parser.CommandType.SORT) {
+            sortTasks(input, tasks, storage);
         } else if (commandType == Parser.CommandType.MARK) {
             markTask(input, tasks, true, storage);
         } else if (commandType == Parser.CommandType.UNMARK) {
@@ -117,6 +119,47 @@ public class TungTung {
     private static void printTaskList(TaskList tasks) {
         printDivider();
         System.out.println("Here are the tasks in your list:");
+        for (int index = 0; index < tasks.size(); index++) {
+            System.out.println((index + 1) + "." + tasks.get(index));
+        }
+        printDivider();
+    }
+
+    /** Sorts tasks by deadline or event start date and displays the sorted list. */
+    private static void sortTasks(String input, TaskList tasks, Storage storage) {
+        String command = input.trim();
+        if (command.equals("sort") || command.equals("sort by")) {
+            printError("OOPS!!! Please specify a sort order. Use: sort by deadline.");
+            return;
+        }
+        if (!command.equals("sort by deadline")) {
+            if (command.startsWith("sort by deadline ")) {
+                printError("OOPS!!! Descending sort is not supported. Use: sort by deadline.");
+            } else if (command.startsWith("sort by ")) {
+                printError("OOPS!!! Unsupported sort order. Use: sort by deadline.");
+            } else {
+                printError("OOPS!!! Invalid sort syntax. Use: sort by deadline.");
+            }
+            return;
+        }
+        if (tasks.size() == 0) {
+            printError("OOPS!!! Nothing to sort here!");
+            return;
+        }
+
+        ArrayList<Task> originalOrder = tasks.toArrayList();
+        tasks.sortByDate();
+        if (!saveTasks(tasks, storage)) {
+            for (int index = tasks.size() - 1; index >= 0; index--) {
+                tasks.remove(index);
+            }
+            for (Task task : originalOrder) {
+                tasks.add(task);
+            }
+            return;
+        }
+        printDivider();
+        System.out.println("Here are your tasks sorted by deadline:");
         for (int index = 0; index < tasks.size(); index++) {
             System.out.println((index + 1) + "." + tasks.get(index));
         }

@@ -22,6 +22,11 @@ class ParserTest {
     }
 
     @Test
+    void identify_sortCommand_returnsSort() {
+        assertEquals(Parser.CommandType.SORT, parser.identify("sort by deadline"));
+    }
+
+    @Test
     void identify_markCommand_returnsMark() {
         assertEquals(Parser.CommandType.MARK, parser.identify("mark"));
         assertEquals(Parser.CommandType.MARK, parser.identify("mark 1"));

@@ -34,6 +34,9 @@ public class ChatbotEngine {
             if (command.startsWith("find ")) {
                 return formatTasks(tasks.find(command.substring(5)), "Here are the matching tasks:");
             }
+            if (command.startsWith("sort") || command.equals("sort")) {
+                return sortTasks(command);
+            }
             if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                 return updateStatus(command);
             }
@@ -60,6 +63,27 @@ public class ChatbotEngine {
             response.append("\n").append(index + 1).append(". ").append(selectedTasks.get(index));
         }
         return response.toString();
+    }
+
+    private String sortTasks(String command) throws TungTungException, IOException {
+        if (command.equals("sort") || command.equals("sort by")) {
+            throw new TungTungException("Please specify a sort order. Use: sort by deadline.");
+        }
+        if (!command.equals("sort by deadline")) {
+            if (command.startsWith("sort by deadline ")) {
+                throw new TungTungException("Descending sort is not supported. Use: sort by deadline.");
+            }
+            if (command.startsWith("sort by ")) {
+                throw new TungTungException("Unsupported sort order. Use: sort by deadline.");
+            }
+            throw new TungTungException("Invalid sort syntax. Use: sort by deadline.");
+        }
+        if (tasks.size() == 0) {
+            throw new TungTungException("Nothing to sort here!");
+        }
+        tasks.sortByDate();
+        save();
+        return formatTasks(tasks.toArrayList(), "Here are your tasks sorted by deadline:");
     }
 
     private String updateStatus(String command) throws TungTungException, IOException {

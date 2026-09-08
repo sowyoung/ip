@@ -94,6 +94,78 @@ Bye! Tung Tung Sagone!
 _____________________________________________________________
 ```
 
+## Test case: sort-tasks-by-deadline
+
+### Aim
+
+Verify that `sort by deadline` orders deadlines and events chronologically,
+places todos at the end, and preserves the sorted order for `list`.
+
+### Input
+
+```text
+todo buy groceries
+deadline submit report /by 2026-09-12
+event project meeting /from 2026-09-10 /to 2026-09-11
+deadline return book /by 2026-09-10
+sort by deadline
+list
+bye
+```
+
+### Expected output
+
+```text
+_____________________________________________________________
+  _____          _    _ ______ _____  ______ 
+ / ____|   /\   | |  | |  ____|  __ \|  ____|
+| (___    /  \  | |__| | |__  | |__) | |__   
+ \___ \  / /\ \  |  __  |  __|  |  _  /|  __|  
+ ____) |/ ____ \| |  | | |____| | \ \| |____ 
+|_____//_/    \_\_|  |_|______|_|  \_\|______|
+
+Hello! Tung Tung Sahere!
+How can I assist?
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [T][ ] buy groceries
+Now you have 1 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [D][ ] submit report (by: Sep 12 2026)
+Now you have 2 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [E][ ] project meeting (from: Sep 10 2026 - to: Sep 11 2026)
+Now you have 3 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Got it. I've added this task:
+  [D][ ] return book (by: Sep 10 2026)
+Now you have 4 tasks in the list.
+_____________________________________________________________
+_____________________________________________________________
+Here are your tasks sorted by deadline:
+1.[E][ ] project meeting (from: Sep 10 2026 - to: Sep 11 2026)
+2.[D][ ] return book (by: Sep 10 2026)
+3.[D][ ] submit report (by: Sep 12 2026)
+4.[T][ ] buy groceries
+_____________________________________________________________
+_____________________________________________________________
+Here are the tasks in your list:
+1.[E][ ] project meeting (from: Sep 10 2026 - to: Sep 11 2026)
+2.[D][ ] return book (by: Sep 10 2026)
+3.[D][ ] submit report (by: Sep 12 2026)
+4.[T][ ] buy groceries
+_____________________________________________________________
+_____________________________________________________________
+Bye! Tung Tung Sagone!
+_____________________________________________________________
+```
+
 ## Test case: add-and-list-todo
 
 ### Aim
