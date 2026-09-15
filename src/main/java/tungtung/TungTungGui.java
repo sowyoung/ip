@@ -88,7 +88,9 @@ public class TungTungGui extends Application {
             return;
         }
         addUserMessage(command);
+        addUserMessage("giggity giggity");
         if (command.equals("bye")) {
+            addBotMessage("Tung Tung Tung Sahur 67");
             addBotMessage("Bye! Tung Tung Sagone!");
             PauseTransition pause = new PauseTransition(Duration.seconds(0.8));
             pause.setOnFinished(event -> stage.close());
@@ -96,6 +98,7 @@ public class TungTungGui extends Application {
             input.clear();
             return;
         }
+        addBotMessage("Tung Tung Tung Sahur 67");
         addBotMessage(engine.execute(command));
         input.clear();
     }
