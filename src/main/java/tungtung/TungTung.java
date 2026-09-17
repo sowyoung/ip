@@ -1,7 +1,6 @@
 package tungtung;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -21,14 +20,9 @@ public class TungTung {
     private static final String GREETING = "Hello! Tung Tung Sahere!\nHow can I assist?";
     private static final String FAREWELL = "Bye! Tung Tung Sagone!";
     private static final String INVALID_TASK_NUMBER = "OOPS!!! Please provide a valid task number.";
-    private static final String INVALID_DEADLINE = "OOPS!!! Use: deadline DESCRIPTION /by yyyy-MM-dd.";
-    private static final String INVALID_EVENT = "OOPS!!! Use: event DESCRIPTION /from yyyy-MM-dd /to yyyy-MM-dd.";
-    private static final String INVALID_DATE = "OOPS!!! Dates must use yyyy-MM-dd, for example 2019-10-15.";
-    private static final String INVALID_EVENT_DATE_RANGE =
-            "OOPS!!! An event's end date cannot be before its start date.";
-    private static final String INVALID_FILE_SEPARATOR = "OOPS!!! Task details cannot contain \" | \".";
     private static final String SAVE_ERROR = "OOPS!!! I could not save your tasks to disk.";
-    private static final String LOAD_ERROR = "OOPS!!! I could not load your saved tasks. Starting with an empty list.";
+    private static final String LOAD_ERROR =
+            "OOPS!!! I could not load your saved tasks. Exiting without changing the saved file.";
     private static final String INVALID_FIND_KEYWORD = "OOPS!!! Please provide a keyword to find.";
 
     /**
@@ -41,7 +35,13 @@ public class TungTung {
         Storage storage = new Storage("data/tungtung.txt");
 
         UI.showGreeting();
-        TaskList tasks = loadTasks(storage);
+        TaskList tasks;
+        try {
+            tasks = loadTasks(storage);
+        } catch (IOException | SecurityException exception) {
+            printError(LOAD_ERROR);
+            return;
+        }
         processCommands(scanner, tasks, storage);
         UI.showFarewell();
     }
@@ -60,7 +60,7 @@ public class TungTung {
      */
     private static void processCommands(Scanner scanner, TaskList tasks, Storage storage) {
         while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().trim();
 
             if (input.equals("bye")) {
                 return;
@@ -106,7 +106,8 @@ public class TungTung {
         printDivider();
         System.out.println("Here are the matching tasks in your list:");
         for (int index = 0; index < matchingTasks.size(); index++) {
-            System.out.println((index + 1) + "." + matchingTasks.get(index));
+            Task task = matchingTasks.get(index);
+            System.out.println((tasks.indexOf(task) + 1) + "." + task);
         }
         printDivider();
     }
@@ -283,105 +284,6 @@ public class TungTung {
     }
 
     /**
-     * Creates the task described by an add-task command.
-     *
-     * @param input add-task command entered by the user
-     * @return the task created from the command
-     * @throws TungTungException if the command is not a supported task command
-     */
-    private static Task createTask(String input) throws TungTungException {
-        if (input.equals("todo")) {
-            throw new TungTungException("OOPS!!! There is nothing TODO.");
-        }
-        if (input.startsWith("todo ")) {
-            String description = input.substring(5);
-            if (description.isBlank()) {
-                throw new TungTungException("OOPS!!! There is nothing TODO.");
-            }
-            validateTaskText(description);
-            return new ToDo(description);
-        }
-        if (input.equals("deadline")) {
-            throw new TungTungException(INVALID_DEADLINE);
-        }
-        if (input.startsWith("deadline ")) {
-            return createDeadline(input.substring(9));
-        }
-        if (input.equals("event")) {
-            throw new TungTungException(INVALID_EVENT);
-        }
-        if (input.startsWith("event ")) {
-            return createEvent(input.substring(6));
-        }
-        throw new TungTungException("OOPS!!! IDK what u are on about :-(");
-    }
-
-    /**
-     * Creates a deadline task from its description and deadline text.
-     *
-     * @param input deadline command text after {@code deadline }
-     * @return a new deadline task
-     */
-    private static Deadline createDeadline(String input) throws TungTungException {
-        String[] parts = input.split(" /by ", 2);
-        if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
-            throw new TungTungException(INVALID_DEADLINE);
-        }
-        validateTaskText(parts[0]);
-        validateTaskText(parts[1]);
-        return new Deadline(parts[0], parseDate(parts[1]));
-    }
-
-    /**
-     * Creates an event task from its description, start time, and end time.
-     *
-     * @param input event command text after {@code event }
-     * @return a new event task
-     */
-    private static Event createEvent(String input) throws TungTungException {
-        String[] parts = input.split(" /from | /to ", 3);
-        if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
-            throw new TungTungException(INVALID_EVENT);
-        }
-        validateTaskText(parts[0]);
-        validateTaskText(parts[1]);
-        validateTaskText(parts[2]);
-        LocalDate from = parseDate(parts[1]);
-        LocalDate to = parseDate(parts[2]);
-        if (to.isBefore(from)) {
-            throw new TungTungException(INVALID_EVENT_DATE_RANGE);
-        }
-        return new Event(parts[0], from, to);
-    }
-
-    /**
-     * Parses a user-entered ISO calendar date.
-     *
-     * @param dateText date entered with a task command
-     * @return parsed date
-     * @throws TungTungException if the date is not in the required format or is impossible
-     */
-    private static LocalDate parseDate(String dateText) throws TungTungException {
-        try {
-            return LocalDate.parse(dateText);
-        } catch (DateTimeParseException exception) {
-            throw new TungTungException(INVALID_DATE);
-        }
-    }
-
-    /**
-     * Rejects text that would be split into multiple fields by the task-file format.
-     *
-     * @param text user-entered task detail
-     * @throws TungTungException if the text contains the file separator
-     */
-    private static void validateTaskText(String text) throws TungTungException {
-        if (text.contains(" | ")) {
-            throw new TungTungException(INVALID_FILE_SEPARATOR);
-        }
-    }
-
-    /**
      * Saves the current task list after a command changes it.
      *
      * @param tasks tasks to save
@@ -391,7 +293,7 @@ public class TungTung {
             storage.save(tasks.toArrayList());
             return true;
         } catch (java.io.IOException | SecurityException exception) {
-            printError(SAVE_ERROR);
+            printError(SAVE_ERROR + " " + exception.getMessage());
             return false;
         }
     }
@@ -399,15 +301,12 @@ public class TungTung {
     /**
      * Restores the saved task list when the chatbot starts.
      *
-     * @param tasks list that receives the restored tasks
+     * @param storage storage containing the saved tasks.
+     * @return the restored task list.
+     * @throws IOException if the saved tasks cannot be read safely.
      */
-    private static TaskList loadTasks(Storage storage) {
-        try {
-            return new TaskList(storage.load());
-        } catch (java.io.IOException | SecurityException exception) {
-            printError(LOAD_ERROR);
-            return new TaskList();
-        }
+    private static TaskList loadTasks(Storage storage) throws IOException {
+        return new TaskList(storage.load());
     }
 
     /**

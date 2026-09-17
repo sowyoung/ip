@@ -7,15 +7,23 @@ import java.util.ArrayList;
 public class ChatbotEngine {
     private final Parser parser = new Parser();
     private final Storage storage;
-    private final TaskList tasks;
+    private TaskList tasks;
+    private String startupError;
 
     /** Creates an engine backed by the application's task file. */
     public ChatbotEngine() {
-        storage = new Storage("data/tungtung.txt");
+        this(new Storage("data/tungtung.txt"));
+    }
+
+    /** Creates an engine with supplied storage, allowing isolated persistence tests. */
+    ChatbotEngine(Storage storage) {
+        this.storage = storage;
         try {
             tasks = new TaskList(storage.load());
         } catch (IOException | SecurityException exception) {
-            throw new IllegalStateException("Unable to load saved tasks.", exception);
+            tasks = new TaskList();
+            startupError = "OOPS!!! Unable to load saved tasks. Your saved file has not been changed. "
+                    + "Back up and repair data/tungtung.txt, then restart. Details: " + exception.getMessage();
         }
     }
 
@@ -26,21 +34,37 @@ public class ChatbotEngine {
      * @return response produced by Tung Tung.
      */
     public String execute(String input) {
+        if (startupError != null) {
+            return startupError;
+        }
+        if (input == null || input.contains("\n") || input.contains("\r")) {
+            return "OOPS!!! Enter one command on a single line.";
+        }
+        ArrayList<Task> originalTasks = tasks.toArrayList();
+        ArrayList<Boolean> originalStatuses = new ArrayList<>();
+        for (Task task : originalTasks) {
+            originalStatuses.add(task.isDone);
+        }
         try {
             String command = input.trim();
             if (command.equals("list")) {
                 return formatTasks(tasks.toArrayList(), "Here are your tasks:");
             }
-            if (command.startsWith("find ")) {
-                return formatTasks(tasks.find(command.substring(5)), "Here are the matching tasks:");
+            if (command.equals("find") || command.startsWith("find ")) {
+                String keyword = command.substring(4).trim();
+                if (keyword.isEmpty()) {
+                    throw new TungTungException("Please provide a keyword to find.");
+                }
+                return formatTasks(tasks.find(keyword), "Here are the matching tasks:");
             }
-            if (command.startsWith("sort") || command.equals("sort")) {
+            if (command.startsWith("sort ") || command.equals("sort")) {
                 return sortTasks(command);
             }
-            if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+            if (command.equals("mark") || command.equals("unmark")
+                    || command.startsWith("mark ") || command.startsWith("unmark ")) {
                 return updateStatus(command);
             }
-            if (command.startsWith("delete ")) {
+            if (command.equals("delete") || command.startsWith("delete ")) {
                 return deleteTask(command);
             }
 
@@ -49,9 +73,26 @@ public class ChatbotEngine {
             save();
             return "Got it! I've added this task:\n" + task
                     + "\nNow you have " + tasks.size() + " tasks in the list.";
-        } catch (TungTungException | IOException | SecurityException exception) {
-            return "OOPS!!! " + exception.getMessage();
+        } catch (IOException | SecurityException exception) {
+            // The list copy shares task objects, so completion flags also need restoring.
+            for (int index = 0; index < originalTasks.size(); index++) {
+                if (originalStatuses.get(index)) {
+                    originalTasks.get(index).setDone();
+                } else {
+                    originalTasks.get(index).setUndone();
+                }
+            }
+            tasks = new TaskList(originalTasks);
+            return "OOPS!!! I could not save your tasks to disk. No changes were made. " + exception.getMessage();
+        } catch (TungTungException exception) {
+            return exception.getMessage().startsWith("OOPS!!!")
+                    ? exception.getMessage() : "OOPS!!! " + exception.getMessage();
         }
+    }
+
+    /** Returns the startup failure message, or null when saved tasks loaded successfully. */
+    public String getStartupError() {
+        return startupError;
     }
 
     private String formatTasks(ArrayList<Task> selectedTasks, String heading) {
@@ -60,7 +101,8 @@ public class ChatbotEngine {
         }
         StringBuilder response = new StringBuilder(heading);
         for (int index = 0; index < selectedTasks.size(); index++) {
-            response.append("\n").append(index + 1).append(". ").append(selectedTasks.get(index));
+            Task task = selectedTasks.get(index);
+            response.append("\n").append(tasks.indexOf(task) + 1).append(". ").append(task);
         }
         return response.toString();
     }
@@ -87,7 +129,7 @@ public class ChatbotEngine {
     }
 
     private String updateStatus(String command) throws TungTungException, IOException {
-        String[] parts = command.split(" ");
+        String[] parts = command.split("\\s+");
         if (parts.length != 2) {
             throw new TungTungException("Please provide a valid task number.");
         }
@@ -103,7 +145,7 @@ public class ChatbotEngine {
     }
 
     private String deleteTask(String command) throws TungTungException, IOException {
-        String[] parts = command.split(" ");
+        String[] parts = command.split("\\s+");
         if (parts.length != 2) {
             throw new TungTungException("Please provide a valid task number.");
         }
@@ -115,11 +157,11 @@ public class ChatbotEngine {
 
     private int taskIndex(String number) throws TungTungException {
         try {
-            int index = Integer.parseInt(number) - 1;
-            if (index < 0 || index >= tasks.size()) {
+            int taskNumber = Integer.parseInt(number);
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
                 throw new TungTungException("Please provide a valid task number.");
             }
-            return index;
+            return taskNumber - 1;
         } catch (NumberFormatException exception) {
             throw new TungTungException("Please provide a valid task number.");
         }

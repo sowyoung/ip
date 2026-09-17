@@ -41,4 +41,4 @@ The generated file is `build\libs\tungtung.jar`. Run it with:
 java -jar build\libs\tungtung.jar
 ```
 
-The JAR uses `tungtung.TungTung` as its entry point, so no classpath or dependency arguments are needed.
+The JAR uses `tungtung.Launcher` to open the JavaFX chat window. No classpath or dependency arguments are needed.

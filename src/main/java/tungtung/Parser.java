@@ -1,5 +1,6 @@
 package tungtung;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -44,6 +45,12 @@ public class Parser {
 
     /** Creates a task from a todo, deadline, or event command. */
     public Task parseTask(String input) throws TungTungException {
+        if (input == null || input.contains("\n") || input.contains("\r")) {
+            throw new TungTungException("OOPS!!! Enter one command on a single line.");
+        }
+        if (!StandardCharsets.UTF_8.newEncoder().canEncode(input)) {
+            throw new TungTungException("OOPS!!! Task details contain invalid Unicode text.");
+        }
         if (input.equals("todo") || input.equals("todo ")) {
             throw new TungTungException("OOPS!!! There is nothing TODO.");
         }
@@ -82,7 +89,15 @@ public class Parser {
     }
 
     private Event parseEvent(String input) throws TungTungException {
-        String[] parts = input.split(" /from | /to ", 3);
+        int fromIndex = input.indexOf(" /from ");
+        int toIndex = input.indexOf(" /to ");
+        if (fromIndex < 0 || toIndex < fromIndex + 7
+                || input.indexOf(" /from ", fromIndex + 1) >= 0
+                || input.indexOf(" /to ", toIndex + 1) >= 0) {
+            throw new TungTungException(INVALID_EVENT);
+        }
+        String[] parts = {input.substring(0, fromIndex),
+            input.substring(fromIndex + 7, toIndex), input.substring(toIndex + 5)};
         if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
             throw new TungTungException(INVALID_EVENT);
         }
@@ -108,7 +123,7 @@ public class Parser {
     }
 
     private void validateTaskText(String text) throws TungTungException {
-        if (text.contains(" | ")) {
+        if ((text + " ").contains(" | ")) {
             throw new TungTungException(INVALID_FILE_SEPARATOR);
         }
     }

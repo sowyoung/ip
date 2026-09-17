@@ -48,6 +48,9 @@ public class TungTungGui extends Application {
         messages.setPadding(new Insets(16));
         messages.setStyle("-fx-background-color: " + HISTORY_BACKGROUND + ";");
         addBotMessage("Hello! Tung Tung Sahere!\nHow can I assist?");
+        if (engine.getStartupError() != null) {
+            addBotMessage(engine.getStartupError());
+        }
 
         history = new ScrollPane(messages);
         history.setFitToWidth(true);

@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,6 +20,7 @@ class TestCase:
     aim: str
     user_input: str
     expected_output: str
+    saved_tasks: str | None
 
 
 def normalise_newlines(text: str) -> str:
@@ -70,6 +72,8 @@ def read_plan(plan_path: Path) -> tuple[Path, str, list[TestCase]]:
                 aim=aim_match.group(1).strip(),
                 user_input=code_block(section, "Input", identifier),
                 expected_output=code_block(section, "Expected output", identifier),
+                saved_tasks=(code_block(section, "Saved tasks", identifier)
+                             if "### Saved tasks" in section else None),
             )
         )
     if not cases:
@@ -81,18 +85,18 @@ def require_java_25(executable: str) -> None:
     """Confirm that the selected Java tool is version 25 before compiling."""
     result = subprocess.run([executable, "-version"], capture_output=True, text=True, check=False)
     version_text = normalise_newlines(result.stdout + result.stderr)
-    if result.returncode != 0 or re.search(r"(?:version |javac )25(?:[.\s\"]|$)", version_text) is None:
+    if result.returncode != 0 or re.search(r"(?:version [\"]?|javac )25(?:[.\s\"]|$)", version_text) is None:
         raise RuntimeError(f"{executable} must be Java 25. Found:\n{version_text.strip()}")
 
 
-def compile_program(source_directory: Path, build_directory: Path) -> None:
-    """Compile every Java source into an isolated UI-test build directory."""
-    java_files = sorted(source_directory.rglob("*.java"))
-    if not java_files:
-        raise RuntimeError(f"No Java files found in {source_directory}.")
+def compile_program(source_directory: Path, build_directory: Path, main_class: str) -> None:
+    """Compile the console entry point and its dependencies without requiring JavaFX."""
+    main_source = source_directory / (main_class.replace(".", "/") + ".java")
+    if not main_source.is_file():
+        raise RuntimeError(f"Main source not found: {main_source}")
     build_directory.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
-        ["javac", "-d", str(build_directory), *map(str, java_files)],
+        ["javac", "-sourcepath", str(source_directory), "-d", str(build_directory), str(main_source)],
         capture_output=True,
         text=True,
         check=False,
@@ -125,15 +129,22 @@ def main() -> int:
             require_java_25(executable)
 
         build_directory = plan_path.parent / ".ui-test-build"
-        compile_program(source_directory, build_directory)
+        compile_program(source_directory, build_directory, main_class)
         for case in cases:
-            result = subprocess.run(
-                ["java", "-cp", str(build_directory), main_class],
-                input=case.user_input,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
+            with tempfile.TemporaryDirectory(prefix="tungtung-ui-") as session_directory:
+                if case.saved_tasks is not None:
+                    data_file = Path(session_directory) / "data" / "tungtung.txt"
+                    data_file.parent.mkdir()
+                    data_file.write_text(case.saved_tasks, encoding="utf-8")
+                result = subprocess.run(
+                    ["java", "-cp", str(build_directory), main_class],
+                    input=case.user_input,
+                    cwd=session_directory,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=30,
+                )
             actual_output = normalise_newlines(result.stdout)
             display_session(case, actual_output)
             if result.returncode != 0 or actual_output != case.expected_output:
@@ -147,7 +158,7 @@ def main() -> int:
                     print(normalise_newlines(result.stderr), end="")
                 return 1
             print("PASS")
-    except (OSError, RuntimeError, ValueError) as error:
+    except (OSError, RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
         print(f"UI tests could not run: {error}", file=sys.stderr)
         return 2
 

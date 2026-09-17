@@ -50,3 +50,24 @@ The reordered task list is saved using the existing storage format. Future
 ## Feature XYZ
 
 // Feature details
+
+## Search result numbers
+
+`find KEYWORD` shows matching tasks with their positions in the full task list.
+Use those same numbers with `mark`, `unmark`, and `delete`. Numbers can change
+after deleting or sorting tasks; run `list` or `find` again to see the current positions.
+
+## Storage errors
+
+If a command cannot be saved, its changes are undone. If the console cannot load
+the saved file, it exits without changing it. Back up and repair `data/tungtung.txt`
+(or restore a valid copy) before restarting.
+
+If another copy of TungTung (or an editor) changes the saved file, further saves
+from the older session are rejected. Restart that session to load the latest data.
+The adjacent `.lock` file coordinates saves and should be left in place.
+
+Event dates require exactly one `/from` followed by exactly one `/to`.
+Descriptions cannot contain ` | ` or end with ` |`; commands must be on one line.
+If the GUI cannot load saved tasks, it shows an error and blocks task changes until
+the file is repaired and the application is restarted.

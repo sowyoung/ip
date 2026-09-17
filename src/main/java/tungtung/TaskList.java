@@ -60,6 +60,11 @@ public class TaskList {
         return tasks.get(index);
     }
 
+    /** Returns the task's zero-based position in the full list, or -1 if absent. */
+    public int indexOf(Task task) {
+        return tasks.indexOf(task);
+    }
+
     /**
      * Removes and returns a task at a particular zero-based position.
      *
